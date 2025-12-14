@@ -21,7 +21,6 @@
 
 ### Chat Commands
 - `/time` : Check how many minutes are left until the next helicopter spawn.
-- `/helicall` : (Admin/Permission required logic not currently enforced, accessible to all in this version) Instantly spawns the helicopter and resets the timer.
 
 ### Configuration
 Currently, settings are hardcoded in the script. You can edit the following variables in the `.cs` file directly if needed:
@@ -47,7 +46,6 @@ Currently, settings are hardcoded in the script. You can edit the following vari
 
 ### チャットコマンド
 - `/time` : 次の出現までの残り時間を表示します。
-- `/helicall` : タイマーをリセットし、即座にヘリコプターを召喚します。
 
 ### 設定について
 現在、設定ファイル（Config）は生成されません。設定を変更したい場合は、`.cs` ファイル内の変数を直接編集してください：
