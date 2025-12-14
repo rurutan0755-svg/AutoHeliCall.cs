@@ -3,23 +3,23 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("AutoHeliCall", "ochapi", "1.2.5")]
-    [Description("60分おきにヘリを1機呼び、残り時間を放送。/helicall で即時召喚可能、/time で残り時間確認")]
+    [Info("AutoHeliCall", "ochapi", "1.2.6")]
+    [Description("Automatically calls 1 helicopter every 60 minutes and broadcasts remaining time. Use /time to check.")]
     public class AutoHeliCall : RustPlugin
     {
-        private const float heliInterval = 3600f; // 60分 (秒)
-        private const float announceStep = 300f;  // 5分 (秒)
-        private const int heliCount = 1;          // 出現させるヘリの数 (ここを1に変更しました)
+        private const float heliInterval = 3600f; // 60 minutes (in seconds)
+        private const float announceStep = 300f;  // 5 minutes (in seconds)
+        private const int heliCount = 1;          // Number of helicopters to spawn
 
-        // 残り時間を秒で保持
+        // Store remaining time in seconds
         private float timeRemaining = heliInterval;
 
         void OnServerInitialized()
         {
-            // 初期残り時間
+            // Set initial remaining time
             timeRemaining = heliInterval;
 
-            // 1秒ごとに残り時間を減らして、0ならヘリ召喚してリセット
+            // Decrease remaining time every second. If 0, spawn heli and reset.
             timer.Every(1f, () =>
             {
                 timeRemaining -= 1f;
@@ -30,7 +30,7 @@ namespace Oxide.Plugins
                 }
             });
 
-            // 5分ごとに全体チャットで残り時間を告知
+            // Announce remaining time to global chat every 5 minutes
             timer.Every(announceStep, () =>
             {
                 if (timeRemaining > 0f)
@@ -42,7 +42,7 @@ namespace Oxide.Plugins
         {
             for (int i = 0; i < heliCount; i++)
             {
-                // 出現位置：マップ原点の上空50m（必要に応じて変更可能）
+                // Spawn position: 50m above map origin (can be changed if needed)
                 BaseEntity heli = GameManager.server.CreateEntity(
                     "assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab",
                     Vector3.up * 50f
@@ -51,8 +51,8 @@ namespace Oxide.Plugins
                     heli.Spawn();
             }
 
-            // メッセージも少し自然になるよう調整（複数形helicoptersのままでも通じますが、数は自動で入ります）
-            PrintToChat($"<color=#ff0000>[Helicopter]</color> <color=#ffff00>{heliCount}機のアタックヘリコプターが出現しました！</color> (Spawned {heliCount} attack helicopter!)");
+            // Message in English
+            PrintToChat($"<color=#ff0000>[Helicopter]</color> <color=#ffff00>Spawned {heliCount} attack helicopter!</color>");
         }
 
         private void AnnounceTime()
@@ -60,19 +60,7 @@ namespace Oxide.Plugins
             int minutes = Mathf.CeilToInt(timeRemaining / 60f);
             PrintToChat(
                 $"<color=#ff0000>[Helicopter]</color> " +
-                $"<color=#00ffff>次のヘリコプター出現まで残り</color> <color=#ffff00>{minutes}分</color> <color=#00ffff>です。</color> " +
-                $"(Next helicopter spawn in <color=#ffff00>{minutes} minutes</color>)"
-            );
-        }
-
-        [ChatCommand("helicall")]
-        private void CmdHeliCall(BasePlayer player, string command, string[] args)
-        {
-            CallHelis();
-            timeRemaining = heliInterval; // 即時召喚したらサイクルをリセット
-            player.ChatMessage(
-                $"<color=#ff0000>[Helicopter]</color> <color=#00ff00>{heliCount}機のヘリを即時召喚しました！</color> " +
-                $"(Spawned {heliCount} helicopter immediately!)"
+                $"<color=#00ffff>Next helicopter spawn in</color> <color=#ffff00>{minutes} minutes</color><color=#00ffff>.</color>"
             );
         }
 
@@ -82,14 +70,13 @@ namespace Oxide.Plugins
             int minutes = Mathf.CeilToInt(timeRemaining / 60f);
             player.ChatMessage(
                 $"<color=#ff0000>[Helicopter]</color> " +
-                $"<color=#00ffff>次のヘリコプター出現まで残り</color> <color=#ffff00>{minutes}分</color> <color=#00ffff>です。</color> " +
-                $"(Next helicopter spawn in <color=#ffff00>{minutes} minutes</color>)"
+                $"<color=#00ffff>Next helicopter spawn in</color> <color=#ffff00>{minutes} minutes</color><color=#00ffff>.</color>"
             );
         }
 
         void Unload()
         {
-            // タイマー参照は保持していないため特別な破棄処理は不要
+            // No special cleanup needed as timers are handled by Oxide
         }
     }
 }
